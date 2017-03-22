@@ -8,10 +8,15 @@
 
 class Node {
 private:
-  int var; // variable for non-terminal node
-  int val; // value for terminal node
-  Node* left;
-  Node* right;
+  static unsigned long _numberOfNode;
+  static Node* _zeroTerminal;
+  int _var; // variable for non-terminal node
+  int _val; // value for terminal node
+  Node* _left;
+  Node* _right;
+public:
+  Node(int);               // for terminal node
+  Node(int, Node*, Node*); // for non-terminal node
 };
 
 #endif
