@@ -1,6 +1,6 @@
-/* nhash.cpp */
+/* hash.cpp */
 
-#include <nhash.hpp>
+#include <hash.hpp>
 
 std::ostream& operator<<(std::ostream& os, const element& e) {
   os << "var = " << e._var << ", val = " << e._val << ", left = " << e._left << ", right = " << e._right << ", state = " << e._state;
@@ -37,20 +37,25 @@ element::element(int var, int val, int left, int right) {
 void element::setEmpty() { _state = empty; }
 void element::setOccupied() { _state = occupied; }
 void element::setDeleted() { _state = deleted; }
+int element::getVar() { return _var; }
+int element::getVal() { return _val; }
+int element::getLeft() { return _left; }
+int element::getRight() { return _right; }
 enum oed element::getState() { return _state; }
-NHash::NHash(unsigned B) {
+
+Hash::Hash(unsigned B) {
   _B = B;
   initialize();
 }
 
-NHash::~NHash() { free(_table); }
+Hash::~Hash() { free(_table); }
 
-void NHash::initialize() {
+void Hash::initialize() {
   _table = (element*)malloc(sizeof(element)*_B);
   for (unsigned i = 0; i < _B; ++i) { _table[i].setEmpty(); }
 }
 
-int NHash::htf(int var, int val, int left, int right) {
+int Hash::htf(int var, int val, int left, int right) {
   int h = 0;
   if (var > -1) { h += var; }
   if (val > -1) { h += val; }
@@ -60,7 +65,7 @@ int NHash::htf(int var, int val, int left, int right) {
   return h % _B;
 }
 
-int NHash::insert(int var, int val, int left, int right) {
+int Hash::insert(int var, int val, int left, int right) {
   /* add element (var, val, left, right) to Hash Table _table */
   int i, k, found = -1;
   enum oed cstate;
@@ -88,7 +93,7 @@ int NHash::insert(int var, int val, int left, int right) {
   return found;
 }
 
-void NHash::remove(int var, int val, int left, int right) {
+void Hash::remove(int var, int val, int left, int right) {
   /* delete the element (var, val, left, right) from Hash Table _table */
   int i, k;
   enum oed cstate;
@@ -104,7 +109,7 @@ void NHash::remove(int var, int val, int left, int right) {
   return;
 }
 
-int NHash::member(int var, int val, int left, int right) {
+int Hash::member(int var, int val, int left, int right) {
   int i, k;
   enum oed cstate;
   element e(var, val, left, right);
@@ -120,4 +125,8 @@ int NHash::member(int var, int val, int left, int right) {
   return -1;
 }
 
-element* NHash::getTable() { return _table; }
+element* Hash::getTable() { return _table; }
+int Hash::topVar(int i) { return _table[i].getVar(); }
+int Hash::topVal(int i) { return _table[i].getVal(); }
+int Hash::getLeft(int i) { return _table[i].getLeft(); }
+int Hash::getRight(int i) { return _table[i].getRight(); }

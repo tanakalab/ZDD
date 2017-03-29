@@ -3,23 +3,31 @@
 #ifndef __ZDD_ZDD_HPP__
 #define __ZDD_ZDD_HPP__
 
-#ifndef __ZDD_NHASH_HPP__
-#include <nhash.hpp>
+#ifndef __ZDD_HASH_HPP__
+#include <hash.hpp>
 #endif
 
 #include <vector>
 #include <string>
 #include <iostream>
+#include <map>
 
 class ZDD {
 private:
-  NHash* _hash;
+  Hash* _hash;
+  std::map< std::pair<int,int>, int> _cache;
   int _root;
   int getNode(int, int, int, int);
+  int topVar(int);
+  int topVal(int);
+  int getLeft(int);
+  int getRight(int);
+  int unification(int, int);
 public:
   ZDD(char**);
   ZDD(std::string*);
   ZDD(std::vector<std::string>&);
+  void print(int, element*);
 };
 
 #endif
