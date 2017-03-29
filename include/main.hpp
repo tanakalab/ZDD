@@ -1,8 +1,10 @@
 /* main.hpp */
 
 #include <string.h>
+#include <stdio.h>
+#include <vector>
 #include <chrono>
 
-#ifndef __ZDD_NODE_HPP__
-#include <node.hpp>
+#ifndef __ZDD_ZDD_HPP__
+#include <zdd.hpp>
 #endif
