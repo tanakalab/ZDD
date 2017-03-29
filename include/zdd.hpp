@@ -11,6 +11,7 @@
 #include <string>
 #include <iostream>
 #include <map>
+#include <unordered_set>
 
 class ZDD {
 private:
@@ -27,7 +28,7 @@ public:
   ZDD(char**);
   ZDD(std::string*);
   ZDD(std::vector<std::string>&);
-  void print(int, element*);
+  void print(int, element*, std::unordered_set<int>*);
 };
 
 #endif

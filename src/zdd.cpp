@@ -25,15 +25,28 @@ ZDD::ZDD(std::vector<std::string>& rulelist) {
   }
   
   element* tb = _hash->getTable();
-  print(f[1], tb);
-  unification(f[0],f[1]);
+  std::unordered_set<int> *us = new std::unordered_set<int>();
+
+  int node = unification(f[0],f[1]);
+  node = unification(node, f[2]);
+  node = unification(node, f[3]);
+  node = unification(node, f[4]);
+
+  print(node, tb, us);
+  // print(f[0], tb, us);
+  // us->clear();
+  // print(f[1], tb, us);
+  delete us;
 }
 
-void ZDD::print(int i, element* tb) {
+void ZDD::print(int i, element* tb, std::unordered_set<int>* us) {
   if (-1 == i) { return; }
+  auto itr = us->find(i);
+  if (us->end() != itr) { return; }
+  us->insert(i);
   std::cout << "id[" << i << "] " << tb[i] << std::endl;
-  print(tb[i].getLeft(), tb);
-  print(tb[i].getRight(), tb);
+  print(tb[i].getLeft(), tb, us);
+  print(tb[i].getRight(), tb, us);
 }
 
 int ZDD::topVar(int i) { return _hash->topVar(i); }
@@ -55,20 +68,26 @@ int ZDD::getNode(int var, int val, int left, int right) {
 int ZDD::unification(int P, int Q) {
   int R;
 
-  if (0 == P) { return Q; }
-  if (0 == Q || P == Q) { return P; }
+  if (0 == P) { std::cout << "0 == P\n"; return Q; }
+  if (0 == Q || P == Q) { std::cout << "0 == Q\n"; return P; }
   if (-1 == topVar(P) && -1 == topVar(Q)) {
-    if (topVal(P) < topVal(Q)) { return topVal(P); }
-    else topVal(Q);
+    if (P < Q) { return P; }
+    else { return Q; }
   }
   auto itr = _cache.find(std::pair<int,int>(P,Q));
   if (_cache.end() != itr) { return itr->second; }
-  if (topVar(P) < topVar(Q) || -1 == topVar(P))
+  if ((topVar(P) < topVar(Q) && topVar(P) != -1) || -1 == topVar(Q)) { // node P is farther than node Q
+    printf("P < Q : P = %d, Q = %d\n", P, Q);
     R = getNode(topVar(P), topVal(P), unification(getLeft(P),Q), getRight(P));
-  if (topVar(P) > topVar(Q) || -1 == topVar(Q))
+  }
+  else if ((topVar(P) > topVar(Q) && topVar(Q) != -1) || -1 == topVar(P)) {
+    printf("P > Q : P = %d, Q = %d\n", P, Q);
     R = getNode(topVar(Q), topVal(Q), unification(P,getLeft(Q)), getRight(Q));
-  if (topVar(P) == topVar(Q))
+  }
+  else if (topVar(P) == topVar(Q)) {
+    printf("P == Q : P = %d, Q = %d\n", P, Q);
     R = getNode(topVar(P), topVal(P), unification(getLeft(P),getLeft(Q)), unification(getRight(P),getRight(Q)));
+  }
   _cache[std::pair<int,int>(P,Q)] = R;
   
   return R;
