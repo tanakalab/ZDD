@@ -68,7 +68,7 @@ int NHash::insert(int var, int val, int left, int right) {
   
   k = i = htf(var, val, left, right);
   do {
-    cstate = _table[i].getState();
+    cstate = _table[k].getState();
     if (cstate == empty || cstate == deleted)
       { if (found < 0) { found = k; } }
     else 
@@ -79,6 +79,7 @@ int NHash::insert(int var, int val, int left, int right) {
 
   if (found < 0) {
     printf("Error: Dictionary is full.\n");
+    std::cout << "i = " << k << ", " << e << std::endl;
     exit(1);
   }
   _table[found] = e;
