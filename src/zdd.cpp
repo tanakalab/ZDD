@@ -36,17 +36,12 @@ ZDD::ZDD(std::vector<std::string>& rulelist, int hsize, int osize) {
   for (unsigned i = 1; i < rulelist.size(); ++i)
     node = unification(node,f[i]);
   _root = node;
-  // node = unification(node, f[2]);
-  // node = unification(node, f[3]);
-  // node = unification(node, f[4]);
-  // _root = unification(node, f[5]);
 }
 
 int ZDD::topVar(int i) { return _hash->topVar(i); }
 int ZDD::topVal(int i) { return _hash->topVal(i); }
 int ZDD::getLeft(int i) { return _hash->getLeft(i); }
 int ZDD::getRight(int i) { return _hash->getRight(i); }
-
 
 /* Warning!! getNode of BDDs is different from one of ZDDs. */
 int ZDD::getNode(int var, int val, int left, int right) {
