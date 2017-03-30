@@ -5,10 +5,14 @@ int main(int argc, char* argv[])
   /* read rules from a file */
   FILE *fp;
   char s[256] = {};
+  if (4 != argc) { 
+    printf("./zdd <rule list> <hash size> <operation cache size>");
+    exit(1);
+  }
 
-  if (argc != 3 || NULL == (fp = fopen(argv[1], "r"))) {
+  if (NULL == (fp = fopen(argv[1], "r"))) {
     printf("File open ERROR!!\n");
-    return 1;
+    exit(1);
   }
 
   std::vector<std::string> vec;
@@ -24,19 +28,20 @@ int main(int argc, char* argv[])
 
   /* construct a MTZDD */
 
-  ZDD z = ZDD(vec);
-  // zdd v = zdd(tt);
-  // for (unsigned i = 0; i < 6; ++i)
-  //   printf("%s", ss[i]);
-  
-  /* free memory allocated dynamically */
-  fclose(fp);
+  ZDD z = ZDD(vec, atoi(argv[2]), atoi(argv[3]));
+  z.print();
+  for (int i = 1; i <= 6; ++i)
+    printf("A number of paths to %d = %d\n", i, z.count(i));
+  std::cout << "A number of nodes = " << z.getNumberOfNodes() << std::endl;
 
+  /* free memory allocated dynamically */
   for (unsigned i = 0; i < 6; ++i) {
     // printf("free ss[%d]\n", i);
     free(ss[i]);
   }
   free(ss);
-  
+
+  fclose(fp);  
+
   return 0;
 }
