@@ -128,8 +128,31 @@ public class ZDD {
 	printSub(hash.getLeft(i), hs);
 	printSub(hash.getRight(i), hs);
     }
-	
 
+    int search(String packet){
+
+	int num = root;
+	int var = hash.topVar(num)-1;
+	
+	for(int i = 0; i < packet.length(); i++){
+	    if( packet.charAt(i) == '1' ){
+		if( var != i)
+		    return 0;
+		else
+		    num = hash.getRight(num);		
+	    }
+	    else{
+		if( var != i)
+		    continue;
+		else
+		    num = hash.getLeft(num);		
+	    }	    
+	    var = hash.topVar(num)-1;
+	}
+	return hash.topVal(num); 
+    }
+    
+    
     
     public static void main(String[] args){ 	  
 	try{
@@ -145,9 +168,9 @@ public class ZDD {
 	    while((rule = br.readLine()) != null)
 		ruleList.add(rule);	
 	    
-	    ZDD bdd = new ZDD(ruleList,Integer.parseInt(args[1]),Integer.parseInt(args[2]));
+	    ZDD zdd = new ZDD(ruleList,Integer.parseInt(args[1]),Integer.parseInt(args[2]));
 	    
-	    bdd.print();
+	    zdd.print();
 	    
 	}catch(FileNotFoundException e) {
 	    e.printStackTrace();
