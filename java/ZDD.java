@@ -97,22 +97,30 @@ public class ZDD {
 	return R;
     }
 
-    int count(int n){
-	
-    	int m = countSub(n,root,hash.getTable());
-    	countCache.clear();
-	return m;
+    int count(){
+	HashSet<Integer> us = new HashSet<Integer>();
+    	int num = countSub(root,us);
+    	us.clear();
+    	return num;
     }
 
-    int countSub(int n, int P, Element[] tb){
-	if(0 == P){ return 0; }
-	else if(n == P){ return 1; }
-	if(tb[P].getVal() != 1){ return 0;}
-	if( null != countCache.get(P) ){return cache.get(P);}
-	int sum  = countSub(n, hash.getLeft(P), tb) + countSub(n, hash.getRight(P), tb);
-	countCache.put(P,sum);
-	return sum;
+    int countSub(int P,HashSet<Integer> us){
+	if(-1 == P){ return 0; }
+	if(us.contains(P)){return 0; }
+	us.add(P);
+	
+	return 1 + countSub(hash.getLeft(P),us) + countSub(hash.getRight(P),us);	
     }
+    
+    // int countSub(int n, int P, Element[] tb){
+    // 	if(0 == P){ return 0; }
+    // 	else if(n == P){ return 1; }
+    // 	if(tb[P].getVal() != 1){ return 0;}
+    // 	if( null != countCache.get(P) ){return cache.get(P);}
+    // 	int sum  = countSub(n, hash.getLeft(P), tb) + countSub(n, hash.getRight(P), tb);
+    // 	countCache.put(P,sum);
+    // 	return sum;
+    // }
     
     
     void print(){
@@ -169,8 +177,10 @@ public class ZDD {
 		ruleList.add(rule);	
 	    
 	    ZDD zdd = new ZDD(ruleList,Integer.parseInt(args[1]),Integer.parseInt(args[2]));
+
+	    //zdd.print();
 	    
-	    zdd.print();
+	    System.out.println( "\n" + zdd.count() );	    
 	    
 	}catch(FileNotFoundException e) {
 	    e.printStackTrace();
