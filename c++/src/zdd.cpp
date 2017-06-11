@@ -3,35 +3,25 @@
 #include <zdd.hpp>
 
 ZDD::ZDD(std::vector<std::string>& rulelist, int hsize, int osize) {
-  _hash = new Hash(hsize);
+  _n = rulelist[0].size();
+  _hash = new Hash(hsize, _n);
   _osize = osize;
-  _numberOfNode = 0;
   std::vector<int> f;
-  
-  _hash->insert(-1,0,-1,-1);
-  ++_numberOfNode;
+
+  _hash->insert(_n+1,0,-1,-1);
   for (unsigned i = 1; i <= rulelist.size(); ++i) {
+    _hash->insert(_n+1,i,-1,-1);
     std::cout << "R[" << i << "] = " << rulelist[i-1] << std::endl;
-    _hash->insert(-1,i,-1,-1);
-    ++_numberOfNode;
   }
   
   for (unsigned i = 1; i <= rulelist.size(); ++i) {
-    int node = _hash->member(-1,i,-1,-1);
-    for (int j = rulelist[i-1].size()-1; j > -1; --j) {
-      if (rulelist[i-1][j] == '1') {
-	node = _hash->insert(j+1,-1,0,node);
-	++_numberOfNode;
-      }
-      if (rulelist[i-1][j] == '*') {
-	node = _hash->insert(j+1,-1,node,node);
-	++_numberOfNode;
-      }
-    }
-    f.push_back(node);
+    // //int node = _hash->member(_n+1,i,-1,-1);
+    // int node = i;
+    // node = makeZDDforRule(node, rulelist[i-1]);
+    // f.push_back(node);
+    f.push_back(makeZDDforRule(i,rulelist[i-1]));
   }
-  
-  // int node = unification(f[0],f[1]);
+
   int node = f[0];
   for (unsigned i = 1; i < rulelist.size(); ++i)
     node = unification(node,f[i]);
@@ -50,8 +40,16 @@ int ZDD::getNode(int var, int val, int left, int right) {
   int P = _hash->member(var, val, left, right);
   if (-1 != P) { return P; }
   P = _hash->insert(var, val, left, right);
-  ++_numberOfNode;
   return P;
+}
+
+int ZDD::makeZDDforRule(int node, std::string& rule) {
+  // std::cout << node << ", " << rule << std::endl;
+  for (int j = rule.size()-1; j > -1; --j) {
+    if (rule[j] == '1') { node = _hash->insert(j+1,-1,0,node); }
+    if (rule[j] == '*') { node = _hash->insert(j+1,-1,node,node);}
+  }
+  return node;
 }
 
 int ZDD::unification(int P, int Q) {
@@ -61,17 +59,18 @@ int ZDD::unification(int P, int Q) {
     return Q; }
   if (0 == Q || P == Q) { // std::cout << "0 == Q\n";
     return P; }
-  if (-1 == topVar(P) && -1 == topVar(Q)) {
+  if (P == _n+1 && Q == _n+1) {
     if (P < Q) { return P; }
     else { return Q; }
   }
   auto itr = _cache.find(std::pair<int,int>(P,Q));
   if (_cache.end() != itr) { return itr->second; }
-  if ((topVar(P) < topVar(Q) && topVar(P) != -1) || -1 == topVar(Q)) { // node P is farther than node Q
+  if (topVar(P) < topVar(Q)) {
+    // node P is farther than node Q
     // printf("P < Q : P = %d, Q = %d\n", P, Q);
     R = getNode(topVar(P), topVal(P), unification(getLeft(P),Q), getRight(P));
   }
-  else if ((topVar(P) > topVar(Q) && topVar(Q) != -1) || -1 == topVar(P)) {
+  else if (topVar(P) > topVar(Q)) {
     // printf("P > Q : P = %d, Q = %d\n", P, Q);
     R = getNode(topVar(Q), topVal(Q), unification(P,getLeft(Q)), getRight(Q));
   }
@@ -118,4 +117,18 @@ void ZDD::printSub(int i, element* tb, std::unordered_set<int>* us) {
   printSub(tb[i].getRight(), tb, us);
 }
 
-unsigned ZDD::getNumberOfNodes() { return _numberOfNode; }
+unsigned ZDD::getNumberOfNodes() {
+  std::unordered_set<int>* us = new std::unordered_set<int>();
+  unsigned num = getNumberOfNodesSub(_root, us);
+  delete us;
+  return num;
+}
+
+unsigned ZDD::getNumberOfNodesSub(int P, std::unordered_set<int>* us) {
+  if (-1 == P) { return 0; }
+  auto itr = us->find(P);
+  if (us->end() != itr) { return 0; }
+  us->insert(P);
+  
+  return 1 + getNumberOfNodesSub(getLeft(P),us) + getNumberOfNodesSub(getRight(P),us);
+}

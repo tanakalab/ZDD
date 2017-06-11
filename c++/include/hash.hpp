@@ -11,8 +11,8 @@ enum oed { occupied, empty, deleted };
 
 class element {
 private:
-  int _var;
-  int _val;
+  int _var; // terminal nodes _var is (n+1), where n is a number of variables
+  int _val; // non terminal nodes _val is -1
   int _left;
   int _right;
   enum oed _state;
@@ -34,12 +34,13 @@ public:
 
 class Hash {
 private:
+  int _n; // a number of variables
   unsigned _B; // bucket size
   element* _table;
   void initialize();
   int htf(int, int, int, int); // hush function
 public:
-  Hash(unsigned);
+  Hash(unsigned, int);
   ~Hash();
   int insert(int, int, int, int);
   void remove(int, int, int, int);

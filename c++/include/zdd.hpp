@@ -16,10 +16,10 @@
 
 class ZDD {
 private:
-  unsigned _numberOfNode;
+  int _n; // a number of variables
   Hash* _hash;
   std::map< std::pair<int,int>, int> _cache;
-  int _osize;
+  unsigned _osize;
   std::map<int, int> _countCache;
   int _root;
   int getNode(int, int, int, int);
@@ -27,6 +27,7 @@ private:
   int topVal(int);
   int getLeft(int);
   int getRight(int);
+  int makeZDDforRule(int, std::string& rule);
   int unification(int, int);
 public:
   ZDD(char**, int, int);
@@ -37,6 +38,7 @@ public:
   int count(int n);  // count a number of paths to the n terminal node
   int countSub(int, int, element*);
   unsigned getNumberOfNodes();
+  unsigned getNumberOfNodesSub(int, std::unordered_set<int>*);
 };
 
 #endif

@@ -43,8 +43,9 @@ int element::getLeft() { return _left; }
 int element::getRight() { return _right; }
 enum oed element::getState() { return _state; }
 
-Hash::Hash(unsigned B) {
+Hash::Hash(unsigned B, int n) {
   _B = B;
+  _n = n;
   initialize();
 }
 
@@ -56,11 +57,12 @@ void Hash::initialize() {
 }
 
 int Hash::htf(int var, int val, int left, int right) {
+  if (var == _n+1) { return val; }
+  
   int h = 0;
-  if (var > -1) { h += var; }
-  if (val > -1) { h += val; }
-  if (left > -1) { h += left; }
-  if (right > -1) { h += right; }
+  h += var;
+  h += left;
+  h += right;
   
   return h % _B;
 }

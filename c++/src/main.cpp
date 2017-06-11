@@ -6,7 +6,7 @@ int main(int argc, char* argv[])
   FILE *fp;
   char s[256] = {};
   if (4 != argc) { 
-    printf("./zdd <rule list> <hash size> <operation cache size>");
+    printf("./zdd <rule list> <hash size> <operation cache size>\n");
     exit(1);
   }
 
