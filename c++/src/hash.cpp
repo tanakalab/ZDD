@@ -3,7 +3,7 @@
 #include <hash.hpp>
 
 std::ostream& operator<<(std::ostream& os, const element& e) {
-  os << "var = " << e._var << ", val = " << e._val << ", left = " << e._left << ", right = " << e._right << ", state = " << e._state;
+  os << "var = " << e._var << ", val = " << e._val << ", left = " << e._left << ", right = " << e._right << ", rcounter = " << e._rcounter << ", state = " << e._state;
   return os;
 }
 
@@ -13,6 +13,7 @@ void element::operator=(const element& r) {
   _left = r._left;
   _right = r._right;
   _state = r._state;
+  _rcounter = r._rcounter;
 }
 
 bool element::operator==(const element& r) {
@@ -32,6 +33,15 @@ element::element(int var, int val, int left, int right) {
   _val = val;
   _left = left;
   _right = right;
+  _rcounter = 0;
+}
+
+element::element(int var, int val, int left, int right, unsigned rcounter) {
+  _var = var;
+  _val = val;
+  _left = left;
+  _right = right;
+  _rcounter = rcounter;
 }
 
 void element::setEmpty() { _state = empty; }
@@ -41,6 +51,9 @@ int element::getVar() { return _var; }
 int element::getVal() { return _val; }
 int element::getLeft() { return _left; }
 int element::getRight() { return _right; }
+unsigned element::getCounter() { return _rcounter; }
+void element::incCounter() { _rcounter += 1; }
+void element::decCounter() { _rcounter -= 1; }
 enum oed element::getState() { return _state; }
 
 Hash::Hash(unsigned B, int n) {
@@ -72,6 +85,34 @@ int Hash::insert(int var, int val, int left, int right) {
   int i, k, found = -1;
   enum oed cstate;
   element e(var, val, left, right);
+  
+  k = i = htf(var, val, left, right);
+  do {
+    cstate = _table[k].getState();
+    if (cstate == empty || cstate == deleted)
+      { if (found < 0) { found = k; } }
+    else 
+      { if (e == _table[i]) { return -1; } }
+
+    k = (k+1)%_B;
+  } while (cstate != empty && k != i);
+
+  if (found < 0) {
+    printf("Error: Dictionary is full.\n");
+    std::cout << "i = " << k << ", " << e << std::endl;
+    exit(1);
+  }
+  _table[found] = e;
+  _table[found].setOccupied();
+
+  return found;
+}
+
+int Hash::insert(int var, int val, int left, int right, unsigned rcounter) {
+  /* add element (var, val, left, right) to Hash Table _table */
+  int i, k, found = -1;
+  enum oed cstate;
+  element e(var, val, left, right, rcounter);
   
   k = i = htf(var, val, left, right);
   do {
@@ -132,3 +173,6 @@ int Hash::topVar(int i) { return _table[i].getVar(); }
 int Hash::topVal(int i) { return _table[i].getVal(); }
 int Hash::getLeft(int i) { return _table[i].getLeft(); }
 int Hash::getRight(int i) { return _table[i].getRight(); }
+unsigned Hash::getCounter(int i) { return _table[i].getCounter(); }
+void Hash::incCounter(int i) { _table[i].incCounter(); }
+void Hash::decCounter(int i) { _table[i].decCounter(); }

@@ -15,9 +15,11 @@ private:
   int _val; // non terminal nodes _val is -1
   int _left;
   int _right;
+  unsigned _rcounter; // number of edges which reference this node. if _rcounter is 0 then this node should be deleted
   enum oed _state;
 public:
   element(int, int, int, int);
+  element(int, int, int, int, unsigned);
   void setEmpty();
   void setOccupied();
   void setDeleted();
@@ -25,6 +27,9 @@ public:
   int getVal();
   int getLeft();
   int getRight();
+  unsigned getCounter();
+  void incCounter();
+  void decCounter();
   enum oed getState();
   friend std::ostream& operator<<(std::ostream&, const element&);
   void operator=(const element&);
@@ -43,6 +48,7 @@ public:
   Hash(unsigned, int);
   ~Hash();
   int insert(int, int, int, int);
+  int insert(int, int, int, int, unsigned);
   void remove(int, int, int, int);
   int member(int, int, int, int);
   element* getTable();
@@ -50,6 +56,9 @@ public:
   int topVal(int);
   int getLeft(int);
   int getRight(int);
+  unsigned getCounter(int);
+  void incCounter(int);
+  void decCounter(int);
 };
 
 #endif

@@ -8,19 +8,12 @@ ZDD::ZDD(std::vector<std::string>& rulelist, int hsize, int osize) {
   _osize = osize;
   std::vector<int> f;
 
-  _hash->insert(_n+1,0,-1,-1);
-  for (unsigned i = 1; i <= rulelist.size(); ++i) {
-    _hash->insert(_n+1,i,-1,-1);
-    std::cout << "R[" << i << "] = " << rulelist[i-1] << std::endl;
-  }
+  _hash->insert(_n+1,0,-1,-1,1);
+  for (unsigned i = 1; i <= rulelist.size(); ++i) 
+    _hash->insert(_n+1,i,-1,-1,1);
   
-  for (unsigned i = 1; i <= rulelist.size(); ++i) {
-    // //int node = _hash->member(_n+1,i,-1,-1);
-    // int node = i;
-    // node = makeZDDforRule(node, rulelist[i-1]);
-    // f.push_back(node);
+  for (unsigned i = 1; i <= rulelist.size(); ++i)
     f.push_back(makeZDDforRule(i,rulelist[i-1]));
-  }
 
   int node = f[0];
   for (unsigned i = 1; i < rulelist.size(); ++i)
@@ -32,22 +25,31 @@ int ZDD::topVar(int i) { return _hash->topVar(i); }
 int ZDD::topVal(int i) { return _hash->topVal(i); }
 int ZDD::getLeft(int i) { return _hash->getLeft(i); }
 int ZDD::getRight(int i) { return _hash->getRight(i); }
+unsigned ZDD::getCounter(int i) { return _hash->getCounter(i); }
+void ZDD::incCounter(int i) { _hash->incCounter(i); }
+void ZDD::decCounter(int i) { _hash->decCounter(i); }
 
 /* Warning!! getNode of BDDs is different from one of ZDDs. */
 int ZDD::getNode(int var, int val, int left, int right) {
   if (0 == right) { return left; }
 
   int P = _hash->member(var, val, left, right);
-  if (-1 != P) { return P; }
-  P = _hash->insert(var, val, left, right);
+  if (-1 != P) {
+    incCounter(P);
+    return P;
+  }
+  P = _hash->insert(var, val, left, right, 1);
   return P;
 }
 
 int ZDD::makeZDDforRule(int node, std::string& rule) {
   // std::cout << node << ", " << rule << std::endl;
   for (int j = rule.size()-1; j > -1; --j) {
-    if (rule[j] == '1') { node = _hash->insert(j+1,-1,0,node); }
-    if (rule[j] == '*') { node = _hash->insert(j+1,-1,node,node);}
+    if (rule[j] == '1') {
+      node = _hash->insert(j+1,-1,0,node,1);
+      incCounter(0);
+    }
+    if (rule[j] == '*') { node = _hash->insert(j+1,-1,node,node,2);}
   }
   return node;
 }

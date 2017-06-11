@@ -27,6 +27,9 @@ private:
   int topVal(int);
   int getLeft(int);
   int getRight(int);
+  unsigned getCounter(int);
+  void incCounter(int);
+  void decCounter(int);
   int makeZDDforRule(int, std::string& rule);
   int unification(int, int);
 public:
