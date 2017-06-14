@@ -30,6 +30,10 @@ int main(int argc, char* argv[])
 
   ZDD z = ZDD(vec, atoi(argv[2]), atoi(argv[3]));
   z.print();
+
+  for (auto h : *(z.getMatchHeaders(1))) 
+    std::cout << h << std::endl;
+
   for (int i = 1; (unsigned)i <= vec.size(); ++i)
     printf("A number of paths to %d = %d\n", i, z.count(i));
   std::cout << "A number of nodes = " << z.getNumberOfNodes() << std::endl;

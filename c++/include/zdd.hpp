@@ -8,6 +8,7 @@
 #endif
 
 #include <vector>
+#include <list>
 #include <string>
 #include <iostream>
 #include <map>
@@ -42,6 +43,8 @@ public:
   int countSub(int, int, element*);
   unsigned getNumberOfNodes();
   unsigned getNumberOfNodesSub(int, std::unordered_set<int>*);
+  std::list<std::string>* getMatchHeaders(int);
+  std::list<std::string>* getMatchHeadersSub(int, int, int, std::map<int, std::list<std::string>>*);
 };
 
 #endif

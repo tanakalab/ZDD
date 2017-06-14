@@ -103,6 +103,22 @@ int ZDD::countSub(int n, int P, element* tb) {
   return sum;
 }
 
+std::list<std::string>* ZDD::getMatchHeaders(int n) {
+  std::map<int, std::list<std::string>>* cache = new std::map<int, std::list<std::string>>();
+  std::list<std::string>* h = getMatchHeadersSub(n, _root, 1, cache);
+  std::list<std::string>* headers = new std::list<std::string>();
+
+  for (auto p : *h) { headers->push_back(p); }
+
+  return headers;
+}
+
+std::list<std::string>* ZDD::getMatchHeadersSub(int n, int P, int j, std::map<int, std::list<std::string>>* cache) {
+  std::list<std::string>* headers = new std::list<std::string>();
+
+  return headers;
+}
+
 void ZDD::print() {
   std::unordered_set<int>* us = new std::unordered_set<int>();
   printSub(_root, _hash->getTable(), us);
