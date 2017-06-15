@@ -29,13 +29,17 @@ int main(int argc, char* argv[])
   /* construct a MTZDD */
 
   ZDD z = ZDD(vec, atoi(argv[2]), atoi(argv[3]));
-  z.print();
+  // z.print();
 
-  for (auto h : *(z.getMatchHeaders(1))) 
-    std::cout << h << std::endl;
+  for (int i = 0; i < 7; ++i) {
+    std::list<std::string>* h = z.getMatchHeaders(i);
+    printf("R[%d] matches: \n", i);
+    if (NULL != h) 
+      for (auto it : *h) { std::cout << it << std::endl; }
+  }
 
-  for (int i = 1; (unsigned)i <= vec.size(); ++i)
-    printf("A number of paths to %d = %d\n", i, z.count(i));
+  // for (int i = 1; (unsigned)i <= vec.size(); ++i)
+  //   printf("A number of paths to %d = %d\n", i, z.count(i));
   std::cout << "A number of nodes = " << z.getNumberOfNodes() << std::endl;
 
   /* free memory allocated dynamically */

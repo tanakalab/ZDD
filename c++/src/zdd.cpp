@@ -105,18 +105,42 @@ int ZDD::countSub(int n, int P, element* tb) {
 
 std::list<std::string>* ZDD::getMatchHeaders(int n) {
   std::map<int, std::list<std::string>>* cache = new std::map<int, std::list<std::string>>();
-  std::list<std::string>* h = getMatchHeadersSub(n, _root, 1, cache);
-  std::list<std::string>* headers = new std::list<std::string>();
 
-  for (auto p : *h) { headers->push_back(p); }
+  std::list<std::string>* h = getMatchHeadersSub(n, _root, 1, cache, _hash->getTable());
 
-  return headers;
+  delete cache;  
+  return h;
 }
 
-std::list<std::string>* ZDD::getMatchHeadersSub(int n, int P, int j, std::map<int, std::list<std::string>>* cache) {
+std::list<std::string>* ZDD::getMatchHeadersSub(int n, int P, int j, std::map<int, std::list<std::string>>* cache, element* tb) {
+  //std::cout << P << " " << tb[P].getVar() << std::endl;
   std::list<std::string>* headers = new std::list<std::string>();
+  headers->push_back("");
+  if (n == P) { return headers; }
+  if (tb[P].getVar() == _n+1) { return NULL; }
+  
+  std::list<std::string>* left = getMatchHeadersSub(n, getLeft(P), j+1, cache, tb);
+  std::list<std::string>* right = getMatchHeadersSub(n, getRight(P), j+1, cache, tb);
 
-  return headers;
+  int k = tb[P].getVar() - j;
+  std::string add = "";
+  for (int i = 0; i < k; ++i) { add += "0"; }
+
+  if (NULL != left) {
+    std::list<std::string>::iterator it, end;
+    it = left->begin(), end = left->end();
+    while (it != end) { *it = "0" + add + *it, ++it; }
+  }
+  if (NULL != right) {
+    std::list<std::string>::iterator it, end;
+    it = right->begin(), end = right->end();
+    while (it != end) { *it = "1" + add + *it, ++it; }
+  }
+  if (NULL != left) {
+    if (NULL != right) { left->splice(left->end(), *right); }
+    return left;
+  }
+  else { return right; }
 }
 
 void ZDD::print() {

@@ -44,7 +44,7 @@ public:
   unsigned getNumberOfNodes();
   unsigned getNumberOfNodesSub(int, std::unordered_set<int>*);
   std::list<std::string>* getMatchHeaders(int);
-  std::list<std::string>* getMatchHeadersSub(int, int, int, std::map<int, std::list<std::string>>*);
+  std::list<std::string>* getMatchHeadersSub(int, int, int, std::map<int, std::list<std::string>>*, element* tb);
 };
 
 #endif
