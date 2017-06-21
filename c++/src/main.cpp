@@ -39,12 +39,12 @@ int main(int argc, char* argv[])
     printf("R[%d] matches: \n", i+1);
     for (auto it : h) { std::cout << it << std::endl; }
   }
-  {
-    std::list<std::string> h = z.getMatchHeaders(0);
-    int n = vec.size() + 1;
-    printf("R[%d] matches: \n", n);
-    for (auto it : h) { std::cout << it << std::endl; }
-  }
+  // {
+  //   std::list<std::string> h = z.getMatchHeaders(0);
+  //   int n = vec.size() + 1;
+  //   printf("R[%d] matches: \n", n);
+  //   for (auto it : h) { std::cout << it << std::endl; }
+  // }
   // {
   //   std::list<std::string> h = z.getMatchHeaders(4);
   //   int n = vec.size() + 1;

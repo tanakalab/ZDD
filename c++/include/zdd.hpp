@@ -45,10 +45,8 @@ public:
   int countSub(int, int, element*);
   unsigned getNumberOfNodes();
   unsigned getNumberOfNodesSub(int, std::unordered_set<int>*);
-  // std::list<std::string>* getMatchHeaders(int);
-  // std::list<std::string>* getMatchHeadersSub(int, int, int, element* tb);
   std::list<std::string> getMatchHeaders(int);
-  std::list<std::string> getMatchHeadersSub(int, int, int, element* tb);
+  std::list<std::string> getMatchHeadersSub(int, int, element* tb);
 };
 
 #endif

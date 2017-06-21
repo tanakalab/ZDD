@@ -16,9 +16,9 @@ ZDD::ZDD(std::vector<std::string>& rulelist, int hsize, int osize) {
     f.push_back(makeZDDforRule(i,rulelist[i-1]));
 
   int node = f[0];
-  for (unsigned i = 1; i < rulelist.size(); ++i) {
+  for (unsigned i = 1; i <= rulelist.size(); ++i) {
     node = unification(node,f[i]);
-    printf("R[%d] is finished\n", i);
+    // printf("R[%d] is finished\n", i);
   }
   _root = node;
 }
@@ -127,37 +127,44 @@ int ZDD::countSub(int n, int P, element* tb) {
 }
 
 std::list<std::string> ZDD::getMatchHeaders(int n) {
-  std::list<std::string> h = getMatchHeadersSub(n, _root, 1, _hash->getTable());
+  std::list<std::string> h = getMatchHeadersSub(n, _root, _hash->getTable());
   _scache.clear();
   return h;
 }
 
-std::list<std::string> ZDD::getMatchHeadersSub(int n, int P, int j, element* tb) {
-  // std::cout << P << " " << tb[P].getVar() << std::endl;
-  std::list<std::string> headers;
+std::list<std::string> ZDD::getMatchHeadersSub(int n, int P, element* tb) {
+  // std::cout << "P = " << P << ", var = " << tb[P].getVar() << std::endl;
 
+  std::list<std::string> headers;
   if (n == P) { 
     headers.push_back("");
     return headers; 
   }
   if (tb[P].getVar() == _n+1) { return headers; }
 
-  int k = tb[P].getVar() - j;
-  std::string add = "";
-  for (int i = 0; i < k; ++i) { add += "0"; }
-  
   auto itr = _scache.find(P);
-  // if (_scache.end() != itr) { return itr->second; }
+  if (_scache.end() != itr) { return itr->second; }
 
-  std::list<std::string> left = getMatchHeadersSub(n, getLeft(P), j+1, tb);
-  std::list<std::string> right = getMatchHeadersSub(n, getRight(P), j+1, tb);
+  std::list<std::string> left = getMatchHeadersSub(n, getLeft(P), tb);
+  std::list<std::string> right = getMatchHeadersSub(n, getRight(P), tb);
+
+  std::string ladd = "";
+  std::string radd = "";
+
+  {
+    int l = tb[getLeft(P)].getVar() - tb[P].getVar() - 1;
+    int r = tb[getRight(P)].getVar() - tb[P].getVar() - 1;
+    for (int i = 0; i < l; ++i) { ladd += "0"; }
+    for (int i = 0; i < r; ++i) { radd += "0"; }
+  }
+  // std::cout << "P = " << P << ", var = " << tb[P].getVar() << ladd << ", " << radd << std::endl;
 
   std::list<std::string>::iterator it, end;
   it = left.begin(), end = left.end();
-  while (it != end) { *it = "0" + add + *it, ++it; }
+  while (it != end) { *it = "0" + ladd + *it, ++it; }
 
   it = right.begin(), end = right.end();
-  while (it != end) { *it = "1" + add + *it, ++it; }
+  while (it != end) { *it = "1" + radd + *it, ++it; }
 
   left.splice(left.end(), right);
   _scache[P] = left;
