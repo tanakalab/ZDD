@@ -16,9 +16,12 @@ ZDD::ZDD(std::vector<std::string>& rulelist, int hsize, int osize) {
     f.push_back(makeZDDforRule(i,rulelist[i-1]));
 
   int node = f[0];
-  for (unsigned i = 1; i <= rulelist.size(); ++i) {
+
+  std::cout << f.size() << std::endl;
+
+  for (unsigned i = 1; i < f.size(); ++i) {
     node = unification(node,f[i]);
-    // printf("R[%d] is finished\n", i);
+    printf("R[%d] is finished\n", i+1);
   }
   _root = node;
 }
