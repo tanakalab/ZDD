@@ -16,8 +16,10 @@ ZDD::ZDD(std::vector<std::string>& rulelist, int hsize, int osize) {
     f.push_back(makeZDDforRule(i,rulelist[i-1]));
 
   int node = f[0];
-  for (unsigned i = 1; i < rulelist.size(); ++i)
+  for (unsigned i = 1; i < rulelist.size(); ++i) {
     node = unification(node,f[i]);
+    printf("R[%d] is finished\n", i);
+  }
   _root = node;
 }
 
@@ -55,7 +57,7 @@ int ZDD::makeZDDforRule(int node, std::string& rule) {
 }
 
 int ZDD::unification(int P, int Q) {
-  int R;
+  int R = 0;
 
   if (0 == P) { // std::cout << "0 == P\n";
     return Q; }
@@ -86,6 +88,27 @@ int ZDD::unification(int P, int Q) {
   return R;
 }
 
+int ZDD::union_(int P, int Q) {
+  if (0 == P) { return Q; }
+  if (0 == Q || P == Q) { return P; }
+
+  int R = 0;
+  auto itr = _cache.find(std::pair<int,int>(P,Q));
+  if (_cache.end() != itr) { return itr->second; }
+  if (topVar(P) < topVar(Q)) {
+    R = getNode(topVar(P), topVal(P), union_(getLeft(P),Q), getRight(P));
+  } else if (topVar(P) > topVar(Q)) {
+    // printf("P > Q : P = %d, Q = %d\n", P, Q);
+    R = getNode(topVar(Q), topVal(Q), unification(P,getLeft(Q)), getRight(Q));
+  } else if (topVar(P) == topVar(Q)) {
+    R = getNode(topVar(P), topVal(P), union_(getLeft(P),getLeft(Q)), union_(getRight(P),getRight(Q)));
+  }
+  _cache[std::pair<int,int>(P,Q)] = R;
+  if (_cache.size() > _osize) { _cache.clear(); }
+  
+  return R;
+}
+
 int ZDD::count(int n) {
   int m = countSub(n, _root, _hash->getTable());
   _countCache.clear();
@@ -103,44 +126,43 @@ int ZDD::countSub(int n, int P, element* tb) {
   return sum;
 }
 
-std::list<std::string>* ZDD::getMatchHeaders(int n) {
-  std::map<int, std::list<std::string>>* cache = new std::map<int, std::list<std::string>>();
-
-  std::list<std::string>* h = getMatchHeadersSub(n, _root, 1, cache, _hash->getTable());
-
-  delete cache;  
+std::list<std::string> ZDD::getMatchHeaders(int n) {
+  std::list<std::string> h = getMatchHeadersSub(n, _root, 1, _hash->getTable());
+  _scache.clear();
   return h;
 }
 
-std::list<std::string>* ZDD::getMatchHeadersSub(int n, int P, int j, std::map<int, std::list<std::string>>* cache, element* tb) {
-  //std::cout << P << " " << tb[P].getVar() << std::endl;
-  std::list<std::string>* headers = new std::list<std::string>();
-  headers->push_back("");
-  if (n == P) { return headers; }
-  if (tb[P].getVar() == _n+1) { return NULL; }
-  
-  std::list<std::string>* left = getMatchHeadersSub(n, getLeft(P), j+1, cache, tb);
-  std::list<std::string>* right = getMatchHeadersSub(n, getRight(P), j+1, cache, tb);
+std::list<std::string> ZDD::getMatchHeadersSub(int n, int P, int j, element* tb) {
+  // std::cout << P << " " << tb[P].getVar() << std::endl;
+  std::list<std::string> headers;
+
+  if (n == P) { 
+    headers.push_back("");
+    return headers; 
+  }
+  if (tb[P].getVar() == _n+1) { return headers; }
 
   int k = tb[P].getVar() - j;
   std::string add = "";
   for (int i = 0; i < k; ++i) { add += "0"; }
+  
+  auto itr = _scache.find(P);
+  // if (_scache.end() != itr) { return itr->second; }
 
-  if (NULL != left) {
-    std::list<std::string>::iterator it, end;
-    it = left->begin(), end = left->end();
-    while (it != end) { *it = "0" + add + *it, ++it; }
-  }
-  if (NULL != right) {
-    std::list<std::string>::iterator it, end;
-    it = right->begin(), end = right->end();
-    while (it != end) { *it = "1" + add + *it, ++it; }
-  }
-  if (NULL != left) {
-    if (NULL != right) { left->splice(left->end(), *right); }
-    return left;
-  }
-  else { return right; }
+  std::list<std::string> left = getMatchHeadersSub(n, getLeft(P), j+1, tb);
+  std::list<std::string> right = getMatchHeadersSub(n, getRight(P), j+1, tb);
+
+  std::list<std::string>::iterator it, end;
+  it = left.begin(), end = left.end();
+  while (it != end) { *it = "0" + add + *it, ++it; }
+
+  it = right.begin(), end = right.end();
+  while (it != end) { *it = "1" + add + *it, ++it; }
+
+  left.splice(left.end(), right);
+  _scache[P] = left;
+
+  return left;
 }
 
 void ZDD::print() {

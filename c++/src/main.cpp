@@ -31,23 +31,31 @@ int main(int argc, char* argv[])
   ZDD z = ZDD(vec, atoi(argv[2]), atoi(argv[3]));
   // z.print();
 
-  for (int i = 0; i < 7; ++i) {
-    std::list<std::string>* h = z.getMatchHeaders(i);
-    printf("R[%d] matches: \n", i);
-    if (NULL != h) 
-      for (auto it : *h) { std::cout << it << std::endl; }
+
+  /* print */
+
+  for (int i = 0; i < (int)vec.size(); ++i) {
+    std::list<std::string> h = z.getMatchHeaders(i+1);
+    printf("R[%d] matches: \n", i+1);
+    for (auto it : h) { std::cout << it << std::endl; }
   }
+  {
+    std::list<std::string> h = z.getMatchHeaders(0);
+    int n = vec.size() + 1;
+    printf("R[%d] matches: \n", n);
+    for (auto it : h) { std::cout << it << std::endl; }
+  }
+  // {
+  //   std::list<std::string> h = z.getMatchHeaders(4);
+  //   int n = vec.size() + 1;
+  //   printf("R[%d] matches: \n", 4);
+  //   for (auto it : h) { std::cout << it << std::endl; }
+  // }
+
 
   // for (int i = 1; (unsigned)i <= vec.size(); ++i)
   //   printf("A number of paths to %d = %d\n", i, z.count(i));
   std::cout << "A number of nodes = " << z.getNumberOfNodes() << std::endl;
-
-  /* free memory allocated dynamically */
-  // for (unsigned i = 0; i < vec.size(); ++i) {
-  //   // printf("free ss[%d]\n", i);
-  //   free(ss[i]);
-  // }
-  // free(ss);
 
   fclose(fp);  
 

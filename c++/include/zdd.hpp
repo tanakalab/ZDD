@@ -20,6 +20,7 @@ private:
   int _n; // a number of variables
   Hash* _hash;
   std::map< std::pair<int,int>, int> _cache;
+  std::map<int, std::list<std::string>> _scache;
   unsigned _osize;
   std::map<int, int> _countCache;
   int _root;
@@ -33,6 +34,7 @@ private:
   void decCounter(int);
   int makeZDDforRule(int, std::string& rule);
   int unification(int, int);
+  int union_(int, int);
 public:
   ZDD(char**, int, int);
   ZDD(std::string*, int, int);
@@ -43,8 +45,10 @@ public:
   int countSub(int, int, element*);
   unsigned getNumberOfNodes();
   unsigned getNumberOfNodesSub(int, std::unordered_set<int>*);
-  std::list<std::string>* getMatchHeaders(int);
-  std::list<std::string>* getMatchHeadersSub(int, int, int, std::map<int, std::list<std::string>>*, element* tb);
+  // std::list<std::string>* getMatchHeaders(int);
+  // std::list<std::string>* getMatchHeadersSub(int, int, int, element* tb);
+  std::list<std::string> getMatchHeaders(int);
+  std::list<std::string> getMatchHeadersSub(int, int, int, element* tb);
 };
 
 #endif
